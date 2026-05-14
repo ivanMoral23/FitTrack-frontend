@@ -1,0 +1,140 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+\geometry{margin=2.5cm}
+
+% Configuración de colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Memoria Técnica Exhaustiva: Proyecto de Integración Nutricional \\ \large Sistema Full-Stack Gym Tracker - PTI FIB-UPC}
+\author{Equipo de Desarrollo de Aplicaciones}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introducción y Objetivos}
+El presente documento constituye la memoria técnica detallada del nuevo módulo de Nutrición desarrollado para la plataforma \texttt{Gym Tracker}. Este proyecto busca resolver la desconexión habitual entre el entrenamiento de fuerza y la gestión de la alimentación, proporcionando al usuario una herramienta unificada y científica.
+
+El objetivo principal es ofrecer una experiencia de usuario (UX) fluida donde el cálculo de necesidades calóricas, la elección de planes de alimentación y el seguimiento diario se realicen de forma automática y se persistan en el tiempo mediante un backend robusto.
+
+\section{Arquitectura del Sistema y Flujo de Datos}
+La arquitectura se divide en tres capas principales: Cliente (Frontend), Servidor (Backend) y Base de Datos.
+
+\subsection{Fuente y Almacenamiento de Datos}
+Para entender el sistema, es vital analizar el ciclo de vida de los datos:
+\begin{enumerate}
+    \item \textbf{Carga Inicial (Frontend)}: Al arrancar, el \texttt{NutritionService} actúa como un puente. Solicita al backend el perfil biométrico del usuario.
+    \item \textbf{Persistencia en MongoDB}: Los datos no son efímeros. Se guardan en una base de datos MongoDB. MongoDB es ideal aquí porque permite guardar objetos complejos como "Dietas" que contienen listas de "Comidas" que a su vez contienen listas de "Alimentos", todo en un solo documento JSON (BSON).
+    \item \textbf{Gestión de Estado (Provider)}: Una vez que los datos llegan al móvil, se almacenan en el estado global. Esto permite que si cambias tu peso en la pantalla de "Perfil", el "Dashboard" se actualice automáticamente sin tener que volver a pedir los datos al servidor.
+\end{enumerate}
+
+\section{Frontend: Desglose Técnico de Archivos}
+Se han creado más de 15 archivos nuevos organizados por su responsabilidad única.
+
+\subsection{Capa de Modelos (\texttt{lib/models/})}
+\begin{itemize}
+    \item \textbf{\texttt{food\_item.dart}}: El átomo del sistema. Almacena el nombre, cantidad en gramos, y los tres macronutrientes esenciales (Proteínas, Carbohidratos y Grasas).
+    \item \textbf{\texttt{meal.dart}}: Agrupa un conjunto de \texttt{FoodItem}. Gestiona el estado de "completado" (\texttt{isCompleted}). Esto es lo que permite que el usuario marque si ya ha cenado.
+    \item \textbf{\texttt{diet\_plan.dart}}: Representa un plan diario. Contiene lógica para sumar todas las calorías de sus comidas y compararlas con el objetivo del usuario.
+    \item \textbf{\texttt{nutrition\_profile.dart}}: Almacena los datos fijos del usuario (edad, sexo, altura, peso) y su factor de actividad física.
+\end{itemize}
+
+\subsection{Capa de Servicios y Utilidades (\texttt{lib/services/ y lib/utils/})}
+\begin{itemize}
+    \item \textbf{\texttt{nutrition\_service.dart}}: Es el corazón lógico. Controla qué dieta está activa, qué comidas se han hecho hoy y gestiona la comunicación con la API REST. Notifica el repintado de la UI mediante \texttt{notifyListeners()}.
+    \item \textbf{\texttt{nutrition\_calculator.dart}}: Implementa la fórmula de \textbf{Mifflin-St Jeor}. Es el encargado de transformar el peso y altura del usuario en un número exacto de kilocalorías diarias.
+    \item \textbf{\texttt{app\_colors.dart}}: Define la identidad visual del módulo, utilizando colores vibrantes para diferenciar los macronutrientes.
+\end{itemize}
+
+\subsection{Pantallas e Interfaz (\texttt{lib/screens/diet/})}
+\begin{itemize}
+    \item \textbf{\texttt{nutrition\_home\_screen.dart}}: El Dashboard principal. Usa widgets de gráficos para mostrar el balance energético.
+    \item \textbf{\texttt{today\_meals\_screen.dart}}: La interfaz diaria. Es donde el usuario interactúa más, marcando sus progresos.
+    \item \textbf{\texttt{user\_nutrition\_profile\_screen.dart}}: Formulario de configuración. Permite al usuario "setear" sus objetivos (ej: Perder Grasa).
+    \item \textbf{\texttt{diet\_recommendations\_screen.dart}}: Galería de planes sugeridos por el sistema.
+    \item \textbf{\texttt{diet\_detail\_screen.dart}}: Vista expandida de una dieta con todo su desglose.
+    \item \textbf{\texttt{nutrition\_calculator\_screen.dart}}: Calculadora aislada para pruebas rápidas.
+\end{itemize}
+
+\subsection{Componentes Reutilizables (\texttt{lib/components/diet/})}
+Se han creado widgets específicos (\texttt{Card}, \texttt{ProgressBar}, \texttt{CustomRing}) para que el diseño sea consistente en toda la aplicación.
+
+\section{Backend: Lógica de Servidor y Endpoints}
+El backend desarrollado en Node.js proporciona la inteligencia de almacenamiento.
+
+\subsection{Endpoints de Nutrición}
+\begin{longtable}{@{}lllp{6cm}@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Método} & \textbf{Input} & \textbf{Descripción} \\ \midrule
+\texttt{/nutrition/profile} & GET & Token JWT & Recupera los datos físicos y objetivos del usuario. \\
+\texttt{/nutrition/profile} & PUT & JSON Perfil & Actualiza peso/altura y recalcula metas en el servidor. \\
+\texttt{/nutrition/diets} & GET & - & Envía el catálogo de dietas disponibles en MongoDB. \\
+\texttt{/nutrition/log} & POST & ComidaID & Registra el consumo de una comida para el histórico diario. \\
+\texttt{/nutrition/history} & GET & Fecha & Recupera lo que el usuario comió en días anteriores. \\ \bottomrule
+\end{longtable}
+
+\section{Persistencia e Histórico}
+\textbf{¿Cómo se guardan los días anteriores?} \\
+El sistema no sobrescribe los datos cada día. En MongoDB, cada registro de comida guardado lleva una marca de tiempo (\texttt{timestamp}). Cuando el usuario entra en la pestaña de nutrición, el sistema pide los logs de la fecha actual. Esto permite que en el futuro se puedan generar gráficas de evolución semanal de peso y adherencia a la dieta.
+
+\section{Cálculo Científico de Calorías}
+El sistema no utiliza valores arbitrarios. Se basa en la tasa metabólica basal (BMR) ajustada por el nivel de actividad (PAL).
+
+\begin{equation}
+TDEE = BMR \times Factor\_Actividad
+\end{equation}
+
+El reparto de macronutrientes se hace siguiendo guías de nutrición deportiva:
+\begin{itemize}
+    \item \textbf{Proteína}: 2.0g por kg de peso corporal (para proteger tejido muscular).
+    \item \textbf{Grasa}: 1.0g por kg de peso corporal (salud hormonal).
+    \item \textbf{Carbohidratos}: Resto energético (combustible para el entrenamiento).
+\end{itemize}
+
+\section{Conclusión}
+La implementación de este módulo representa un salto cualitativo para \texttt{Gym Tracker}. No solo añade funcionalidad, sino que lo hace bajo una arquitectura robusta, modular y científicamente fundamentada, asegurando que el código sea fácil de ampliar y que los datos se gestionen de forma segura y persistente en el Backend.
+
+\end{document}

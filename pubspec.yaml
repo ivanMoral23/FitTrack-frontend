@@ -1,0 +1,32 @@
+name: fittrack_flutter
+
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.2
+  fl_chart: ^1.2.0
+  intl: ^0.20.2
+  provider: ^6.1.5+1
+  uuid: ^4.3.3
+  google_fonts: ^8.0.2
+  flutter_animate: ^4.5.0
+  health: ^12.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

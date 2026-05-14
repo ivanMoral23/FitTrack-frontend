@@ -1,0 +1,36 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - main # Cambia esto por la rama que uses para pruebas
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Instalar FastForge
+        run: dart pub global activate fastforge
+
+      - name: Obtener dependencias de Flutter
+        run: flutter pub get
+
+      - name: Construir APK con FastForge
+        run: fastforge release --name test-build
+
+      - name: Publicar APK en GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          files: dist/**/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
