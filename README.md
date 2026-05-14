@@ -36,4 +36,4 @@ A cross-platform mobile application for fitness, nutrition, and health tracking,
    ```
 
 ---
-*Developed by Iván Fernández - 2026*
+*Developed by Iván Moral - 2026*
