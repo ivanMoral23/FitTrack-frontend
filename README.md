@@ -17,8 +17,8 @@ A cross-platform mobile application for fitness, nutrition, and health tracking,
 - **Design:** Material Design 3 with Clean Architecture principles.
 
 ## 📸 Screenshots
-<img width="920" height="2046" alt="Home_Screenshot_FitTrack" src="https://github.com/user-attachments/assets/66d56d86-9352-45a1-aaa1-8a23490416dd" />
-<img width="921" height="2048" alt="image" src="https://github.com/user-attachments/assets/74b8eecb-4085-436d-a2ff-b668c7974986" />
+<img width="230" height="512" alt="Home_Screenshot_FitTrack" src="https://github.com/user-attachments/assets/66d56d86-9352-45a1-aaa1-8a23490416dd" />
+<img width="230" height="512" alt="image" src="https://github.com/user-attachments/assets/74b8eecb-4085-436d-a2ff-b668c7974986" />
 
 
 ## 🚀 Quick Start Guide
